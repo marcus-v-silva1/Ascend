@@ -3,6 +3,7 @@
 //
 // Uso:
 //   npm run times:sync            abre o navegador; faça login e navegue pelos seus cursos
+//   npm run times:sync -- --edge  usa o Microsoft Edge em vez do Chromium
 //   npm run times:sync -- --map   só remapeia o que já foi capturado
 //
 // Como funciona:
@@ -30,6 +31,8 @@ const OUTPUT = "times-export.json";
 async function capture() {
   await mkdir(RAW_DIR, { recursive: true });
   const context = await chromium.launchPersistentContext(SESSION_DIR, {
+    // --edge usa o Microsoft Edge instalado (perfil próprio em .times-session, não o seu perfil principal)
+    ...(process.argv.includes("--edge") ? { channel: "msedge" } : {}),
     headless: false,
     viewport: null,
     args: ["--start-maximized"],
@@ -41,6 +44,8 @@ async function capture() {
       const url = new URL(response.url());
       const site = [...SITES, ...API_HOSTS].find((s) => url.hostname.endsWith(s.host));
       if (!site) return;
+      // Nunca grava respostas de login/sessão: elas carregam o token de acesso
+      if (/\/(auth|login|token|session|me)(\/|$)/i.test(url.pathname)) return;
       const type = response.headers()["content-type"] ?? "";
       if (!type.includes("json") || response.status() >= 400) return;
       const body = await response.json();
@@ -122,6 +127,45 @@ function findVocab(node, out, depth = 0) {
   for (const value of Object.values(node)) findVocab(value, out, depth + 1);
 }
 
+// Formato conhecido do Times Connected: GET /api/statistics/home
+function mapConnectedStatistics(data) {
+  const books = data.listOfBooksEvolution ?? data.list_of_books_evolution ?? [];
+  const classes = data.listOfClassesEvolution ?? data.list_of_classes_evolution ?? [];
+  const w = data.workload ?? {};
+  const status = (done, total) => (total > 0 && done >= total ? "done" : done > 0 ? "doing" : "todo");
+  const current = books.find((b) => b.performedQuantity < b.quantityOfClasses);
+  return [
+    {
+      platform: "times_connected",
+      ref: "curso-livros",
+      title: "Times Connected: evolução nos livros",
+      level: current ? `Book ${current.number} - ${current.name} (${current.performedQuantity} de ${current.quantityOfClasses} aulas)` : "Curso concluído",
+      units: books.map((b, i) => ({
+        ref: `book-${b.number}`,
+        title: `Book ${b.number} - ${b.name} (${b.performedQuantity} de ${b.quantityOfClasses} aulas)`,
+        position: i,
+        status: status(b.performedQuantity, b.quantityOfClasses),
+        score: Number(b.performedPercent) || 0,
+        completedAt: null,
+      })),
+    },
+    {
+      platform: "times_connected",
+      ref: "aulas-por-tipo",
+      title: "Times Connected: aulas por tipo",
+      level: w.approved !== undefined ? `${w.approved} aulas aprovadas, ${w.disapproved ?? 0} reprovadas` : null,
+      units: classes.map((c, i) => ({
+        ref: String(c.name).toLowerCase(),
+        title: `${c.name} (${c.performed} de ${c.quantityOfClasses})`,
+        position: i,
+        status: status(c.performed, c.quantityOfClasses),
+        score: Number(c.performedPercent) || 0,
+        completedAt: null,
+      })),
+    },
+  ];
+}
+
 async function map() {
   let files = [];
   try {
@@ -134,7 +178,12 @@ async function map() {
   const courses = new Map();
   const vocab = new Map();
   for (const f of files) {
-    const { platform, body } = JSON.parse(await readFile(join(RAW_DIR, f), "utf8"));
+    const { platform, body, url } = JSON.parse(await readFile(join(RAW_DIR, f), "utf8"));
+    if (/\/api\/statistics\/home/.test(url ?? "") && body?.data) {
+      // Formato conhecido: substitui o que a heurística tiver achado para o Connected
+      for (const c of mapConnectedStatistics(body.data)) courses.set(`${c.platform}:${c.ref}`, c);
+      continue;
+    }
     const lists = [];
     findLists(body, null, lists);
     for (const { list, parent } of lists) {
