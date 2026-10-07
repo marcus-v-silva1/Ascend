@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth";
 import { getQuestionProgress, getSubjects } from "@/lib/data/study";
 import { gradeAnswer, scoreSession, type QuestionType } from "@/lib/grading";
 import { newCardRow } from "@/lib/srs";
+import { questionNumber } from "@/lib/question-import";
 import { descendantIds, filterQuestions, pickInterleaved } from "@/lib/study";
 
 const startSchema = z.object({
@@ -33,33 +34,44 @@ export async function startSession(_prev: StartState, formData: FormData): Promi
 
   let durationMin: number | null = null;
   let passPct: number | null = null;
+  let officialCount: number | null = null;
+  let tag: string | null = null;
   if (presetId) {
     const { data: preset } = await supabase
       .from("exam_presets")
-      .select("duration_min, pass_pct, question_count")
+      .select("duration_min, pass_pct, question_count, tag")
       .eq("id", presetId)
       .single();
     if (preset) {
       durationMin = preset.duration_min;
       passPct = preset.pass_pct;
+      officialCount = preset.question_count;
+      tag = preset.tag;
     }
   }
 
-  const subjects = await getSubjects(supabase);
-  const scope = [...new Set(subjectIds.flatMap((id) => descendantIds(subjects, id)))];
-  const progress = await getQuestionProgress(supabase, scope);
-  const pool = filterQuestions(progress, filter);
-  if (pool.length === 0) {
-    return { error: "Nenhuma questão encontrada com esse filtro. Tente 'Todas' ou outro assunto." };
-  }
-  const questionIds = pickInterleaved(pool, count);
-
-  // Simulado com menos questões que o oficial: tempo proporcional
-  if (durationMin && presetId) {
-    const { data: preset } = await supabase.from("exam_presets").select("question_count").eq("id", presetId).single();
-    if (preset && questionIds.length < preset.question_count) {
-      durationMin = Math.max(1, Math.round((durationMin * questionIds.length) / preset.question_count));
+  let questionIds: string[];
+  if (tag) {
+    // Prova anterior: todas as questões, na ordem original, sem sorteio
+    const { data: rows } = await supabase.from("questions").select("id, external_id").contains("tags", [tag]);
+    questionIds = ((rows ?? []) as { id: string; external_id: string | null }[])
+      .sort((a, b) => questionNumber(a.external_id) - questionNumber(b.external_id))
+      .map((r) => r.id);
+    if (questionIds.length === 0) return { error: "As questões desta prova não foram encontradas. Importe o arquivo de novo." };
+  } else {
+    const subjects = await getSubjects(supabase);
+    const scope = [...new Set(subjectIds.flatMap((id) => descendantIds(subjects, id)))];
+    const progress = await getQuestionProgress(supabase, scope);
+    const pool = filterQuestions(progress, filter);
+    if (pool.length === 0) {
+      return { error: "Nenhuma questão encontrada com esse filtro. Tente 'Todas' ou outro assunto." };
     }
+    questionIds = pickInterleaved(pool, count);
+  }
+
+  // Menos questões que o oficial (anuladas, falta de banco): tempo proporcional
+  if (durationMin && officialCount && questionIds.length < officialCount && !tag) {
+    durationMin = Math.max(1, Math.round((durationMin * questionIds.length) / officialCount));
   }
 
   const { data: session, error } = await supabase

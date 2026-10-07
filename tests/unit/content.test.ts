@@ -1,3 +1,4 @@
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { DECKS } from "@/content/decks";
 import { GOALS, MILESTONES, PLANNED_COSTS, TARGETS, TASKS, TRACKS } from "@/content/plan";
@@ -6,6 +7,7 @@ import { CONCURSO_QUESTIONS, ISTQB_QUESTIONS } from "@/content/questions/istqb-c
 import { PSM_QUESTIONS } from "@/content/questions/psm";
 import { PRESETS, SUBJECTS } from "@/content/subjects";
 import { toQuestionRow } from "@/content/types";
+import { parseImport } from "@/lib/question-import";
 
 const QUESTIONS = [...PSM_QUESTIONS, ...COBIT_QUESTIONS, ...ITIL_QUESTIONS, ...ISTQB_QUESTIONS, ...CONCURSO_QUESTIONS];
 const subjectIds = new Set(SUBJECTS.map((s) => s.id));
@@ -75,5 +77,24 @@ describe("conteúdo semente", () => {
     expect(count("psm")).toBeGreaterThanOrEqual(45);
     expect(count("cobit")).toBeGreaterThanOrEqual(20);
     expect(count("itil")).toBeGreaterThanOrEqual(20);
+  });
+});
+
+// Provas oficiais convertidas localmente (provas/ fica fora do git; no CI isto é pulado)
+
+const provasDir = "provas/json";
+const provaFiles = existsSync(provasDir) ? readdirSync(provasDir).filter((f) => f.endsWith(".json")) : [];
+
+describe.skipIf(provaFiles.length === 0)("provas convertidas", () => {
+  it.each(provaFiles)("%s é importável e usa assuntos existentes", (file) => {
+    const r = parseImport(JSON.parse(readFileSync(`${provasDir}/${file}`, "utf8")));
+    expect(r.ok, r.ok ? "" : r.error).toBe(true);
+    if (!r.ok) return;
+    for (const q of r.data.items) {
+      expect(subjectIds, q.id).toContain(q.subject);
+      expect(q.options?.length, q.id).toBe(5);
+      expect(q.options?.every((o) => o.length > 0), q.id).toBe(true);
+    }
+    expect(r.data.items.length).toBeGreaterThanOrEqual(20);
   });
 });

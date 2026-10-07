@@ -96,13 +96,16 @@ export function ImportForm() {
   const [state, action, pending] = useActionState<ImportState, FormData>(importQuestions, {});
 
   useEffect(() => {
-    if (state.imported) toast.success(`${state.imported} questões importadas.`);
+    if (state.imported === undefined) return;
+    const parts = [`${state.imported} questões novas`];
+    if (state.reused) parts.push(`${state.reused} já existiam e foram reaproveitadas`);
+    toast.success(state.prova ? `${state.prova}: ${parts.join(", ")}. O simulado da prova está em Questões.` : `${parts.join(", ")}.`);
   }, [state]);
 
   return (
     <form action={action} className="space-y-3">
       <p className="text-sm text-muted-foreground">
-        Envie um arquivo .json ou cole o conteúdo. <code>subject</code> aceita o código do assunto (ex.: <code>psm-eventos</code>) ou o nome. <code>correct</code> aceita índices (0 = A), letras ou true/false.
+        Envie um arquivo .json (uma lista de questões ou uma prova completa gerada por <code>scripts/parse-prova.py</code>) ou cole o conteúdo. <code>subject</code> aceita o código do assunto (ex.: <code>psm-eventos</code>) ou o nome. <code>correct</code> aceita índices (0 = A), letras ou true/false.
       </p>
       <input type="file" name="file" accept="application/json,.json" aria-label="Arquivo JSON" className="block text-sm file:mr-3 file:rounded-md file:border-0 file:bg-secondary file:px-3 file:py-1.5 file:text-sm" />
       <label htmlFor="import-json" className="sr-only">JSON</label>

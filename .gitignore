@@ -54,3 +54,6 @@ times-export.json
 # supabase local
 supabase/.temp/
 supabase/.branches/
+
+# provas oficiais de concursos (uso pessoal, não publicar)
+/provas/

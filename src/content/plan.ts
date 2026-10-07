@@ -140,7 +140,8 @@ export const MILESTONES = [
   { external_id: "m-itil-version", track: "certificacoes", goal: "g-itil", title: "Confirmar com RH a versão do ITIL exigida", due_date: "2026-10-20" },
   { external_id: "m-psm-voucher", track: "certificacoes", goal: "g-psm", title: "Comprar voucher PSM I (após 3 simulados ≥ 95%)", due_date: "2026-10-25" },
   { external_id: "m-trt8", track: "concursos", title: "TRT-8: prova prevista (Belém)", due_date: "2027-01-17", notes: "Concurso aberto com cargos de TI; bom treino de prova real." },
-  { external_id: "m-dataprev-edital", track: "concursos", title: "Acompanhar próximo edital Dataprev (lotação SC)", due_date: "2026-12-31" },
+  { external_id: "m-dataprev-prova", track: "concursos", title: "Prova Dataprev 2026 (FGV): ATI Desenvolvimento de Software, 13h", due_date: "2026-10-11", notes: "70 questões em 4h. Levar documento com foto e caneta preta transparente." },
+  { external_id: "m-dataprev-gabarito", track: "concursos", title: "Conferir gabarito preliminar da Dataprev no site da FGV", due_date: "2026-10-13" },
   { external_id: "m-tjsc-edital", track: "concursos", title: "Acompanhar edital TJSC Analista de Sistemas", due_date: "2027-03-31" },
   { external_id: "m-eu-first-apps", track: "europa", goal: "g-eu-apply", title: "Primeiras 10 candidaturas (Irlanda + Alemanha)", due_date: "2027-01-31" },
   { external_id: "m-eu-reserve", track: "europa", title: "Reserva de mudança completa", due_date: "2027-09-30" },
@@ -149,7 +150,7 @@ export const MILESTONES = [
 
 export const TARGETS = [
   // Concursos: notas da análise (compatibilidade, dificuldade, salário, localização)
-  { external_id: "t-dataprev", track: "concursos", kind: "concurso", name: "Dataprev: Analista de TI", location: "Florianópolis/SC", salary_text: "R$ 10.685 + benefícios", salary_value: 10685, compatibility: 9.5, difficulty: 7.5, salary_score: 8.5, location_score: 10, status: "monitorando", notes: "Primeiro alvo. Perfis: análise de negócios, desenvolvimento, sustentação, governança, gestão de serviços." },
+  { external_id: "t-dataprev", track: "concursos", kind: "concurso", name: "Dataprev: Analista de TI", location: "Florianópolis/SC", salary_text: "R$ 10.685 + benefícios", salary_value: 10685, compatibility: 9.5, difficulty: 7.5, salary_score: 8.5, location_score: 10, status: "inscrito: Desenv. Software", exam_date: "2026-10-11", url: "https://conhecimento.fgv.br/concursos/dataprev26", notes: "Banca FGV, 70 questões em 4h. Treine com as provas da Dataprev 2024 (mesma banca). Perfis: análise de negócios, desenvolvimento, sustentação, governança, gestão de serviços." },
   { external_id: "t-tjsc", track: "concursos", kind: "concurso", name: "TJSC: Analista de Sistemas", location: "Florianópolis/SC (sede)", salary_text: "~R$ 10–15k+", salary_value: 12000, compatibility: 9, difficulty: 8, salary_score: 9, location_score: 10, status: "monitorando" },
   { external_id: "t-cidasc", track: "concursos", kind: "concurso", name: "CIDASC: Analista TIC (Sistemas e Negócios)", location: "SC", salary_text: "R$ 10.558+", salary_value: 10558, compatibility: 9.5, difficulty: 7.5, salary_score: 8.5, location_score: 9, status: "monitorando", notes: "Edital cobra governança de TIC, testes, Agile/Scrum/Kanban, PMBOK e ITIL." },
   { external_id: "t-trf4", track: "concursos", kind: "concurso", name: "TRF4: Analista Judiciário (Sistemas)", location: "SC/RS/PR", salary_text: "~R$ 14k+", salary_value: 14000, compatibility: 8.5, difficulty: 9, salary_score: 9, location_score: 9, status: "monitorando", notes: "Último concurso homologado em mar/2026." },

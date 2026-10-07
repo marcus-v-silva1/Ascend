@@ -45,6 +45,8 @@ export const SUBJECTS: SeedSubject[] = [
   { id: "conc-ageis", name: "Metodologias Ágeis e Projetos", kind: "discipline", parent: "concursos" },
   { id: "conc-lgpd", name: "LGPD", kind: "discipline", parent: "concursos" },
   { id: "conc-portugues", name: "Língua Portuguesa", kind: "discipline", parent: "concursos" },
+  { id: "conc-ingles", name: "Língua Inglesa", kind: "discipline", parent: "concursos" },
+  { id: "conc-atualidades", name: "Atualidades e IA", kind: "discipline", parent: "concursos" },
   { id: "conc-constitucional", name: "Direito Constitucional", kind: "discipline", parent: "concursos" },
   { id: "conc-administrativo", name: "Direito Administrativo", kind: "discipline", parent: "concursos" },
   { id: "conc-rlm", name: "Raciocínio Lógico", kind: "discipline", parent: "concursos" },

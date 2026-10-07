@@ -4,23 +4,15 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { toQuestionRow, type SeedQuestion } from "@/content/types";
 import { requireUser } from "@/lib/auth";
+import { parseImport, provaTag, stemKey } from "@/lib/question-import";
 
-const importItem = z.object({
-  subject: z.string().min(1),
-  stem: z.string().min(5),
-  options: z.array(z.string().min(1)).min(2).max(10).optional(),
-  correct: z.union([z.boolean(), z.array(z.number().int().min(0)).min(1), z.array(z.string().regex(/^[a-j]$/i)).min(1)]),
-  explanation: z.string().default(""),
-  source: z.string().optional(),
-  source_url: z.url().optional(),
-  board: z.string().optional(),
-  year: z.number().int().min(1990).max(2100).optional(),
-  difficulty: z.number().int().min(1).max(5).optional(),
-});
+export type ImportState = { error?: string; imported?: number; reused?: number; prova?: string };
 
-export type ImportState = { error?: string; imported?: number };
-
-/** Importa questões em JSON. `subject` aceita o id externo (ex.: "psm-eventos") ou o nome do assunto. */
+/**
+ * Importa questões em JSON: uma lista ou { prova, questions }.
+ * `subject` aceita o código do assunto (ex.: "psm-eventos") ou o nome.
+ * Questões com o mesmo enunciado de uma já existente são reaproveitadas (só ganham a etiqueta da prova).
+ */
 export async function importQuestions(_prev: ImportState, formData: FormData): Promise<ImportState> {
   const { supabase } = await requireUser();
   const file = formData.get("file");
@@ -33,38 +25,66 @@ export async function importQuestions(_prev: ImportState, formData: FormData): P
   } catch {
     return { error: "JSON inválido. Confira vírgulas e aspas." };
   }
-  const parsed = z.array(importItem).max(2000).safeParse(json);
-  if (!parsed.success) {
-    const issue = parsed.error.issues[0];
-    return { error: `Item ${String(issue.path[0] ?? "")}: ${issue.path.slice(1).join(".")} ${issue.message}` };
-  }
+  const parsed = parseImport(json);
+  if (!parsed.ok) return { error: parsed.error };
+  const { prova, items } = parsed.data;
 
-  const { data: subjects } = await supabase.from("subjects").select("id, external_id, name");
+  const [{ data: subjects }, { data: existing }] = await Promise.all([
+    supabase.from("subjects").select("id, external_id, name"),
+    supabase.from("questions").select("id, stem, external_id, tags"),
+  ]);
   const lookup = new Map<string, string>();
   for (const s of subjects ?? []) {
     if (s.external_id) lookup.set(s.external_id.toLowerCase(), s.id);
     lookup.set(s.name.toLowerCase(), s.id);
   }
+  type Existing = { id: string; stem: string; external_id: string | null; tags: string[] };
+  const byStem = new Map(((existing ?? []) as Existing[]).map((q) => [stemKey(q.stem), q]));
+  const byExternal = new Map(((existing ?? []) as Existing[]).filter((q) => q.external_id).map((q) => [q.external_id!, q]));
 
   const rows = [];
-  for (const [i, item] of parsed.data.entries()) {
+  const retag: { id: string; tags: string[] }[] = [];
+  for (const [i, item] of items.entries()) {
     const subjectId = lookup.get(item.subject.toLowerCase());
     if (!subjectId) return { error: `Item ${i}: assunto "${item.subject}" não existe.` };
-    const correct =
-      typeof item.correct === "boolean"
-        ? item.correct
-        : item.correct.map((c) => (typeof c === "number" ? c : c.toLowerCase().charCodeAt(0) - 97));
-    if (typeof correct !== "boolean" && correct.some((c) => c >= (item.options?.length ?? 0))) {
-      return { error: `Item ${i}: gabarito aponta para alternativa inexistente.` };
+    const same = (item.id && byExternal.get(item.id)) || byStem.get(stemKey(item.stem));
+    if (same) {
+      const tags = [...new Set([...(same.tags ?? []), ...(item.tags ?? [])])];
+      if (tags.length !== (same.tags ?? []).length) retag.push({ id: same.id, tags });
+      continue;
     }
-    const row = toQuestionRow({ ...item, id: "", correct, explanation: item.explanation, difficulty: item.difficulty as SeedQuestion["difficulty"] });
-    rows.push({ ...row, external_id: null, subject_id: subjectId });
+    const row = toQuestionRow({ ...item, id: "", explanation: item.explanation, difficulty: item.difficulty as SeedQuestion["difficulty"] });
+    rows.push({ ...row, external_id: item.id ?? null, subject_id: subjectId, tags: item.tags ?? [] });
+    byStem.set(stemKey(item.stem), { id: "", stem: item.stem, external_id: item.id ?? null, tags: item.tags ?? [] });
   }
 
-  const { error } = await supabase.from("questions").insert(rows);
-  if (error) return { error: "Não foi possível salvar as questões." };
+  if (rows.length) {
+    const { error } = await supabase.from("questions").insert(rows);
+    if (error) return { error: "Não foi possível salvar as questões." };
+  }
+  for (const r of retag) await supabase.from("questions").update({ tags: r.tags }).eq("id", r.id);
+
+  if (prova) {
+    const subjectId = lookup.get(prova.subject.toLowerCase()) ?? null;
+    const { error } = await supabase.from("exam_presets").upsert(
+      {
+        external_id: `prova-${prova.slug}`,
+        name: prova.name,
+        subject_id: subjectId,
+        question_count: items.length,
+        duration_min: prova.durationMin,
+        pass_pct: prova.passPct,
+        ready_pct: Math.min(100, prova.passPct + 15),
+        official_url: prova.officialUrl ?? null,
+        tag: provaTag(prova.slug),
+      },
+      { onConflict: "user_id,external_id" },
+    );
+    if (error) return { error: "Questões salvas, mas não foi possível criar o simulado da prova." };
+  }
+
   revalidatePath("/estudos", "layout");
-  return { imported: rows.length };
+  return { imported: rows.length, reused: items.length - rows.length, prova: prova?.name };
 }
 
 const createSchema = z.object({

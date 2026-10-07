@@ -96,7 +96,19 @@ Em **Questões → Banco de questões → Importar em lote**, envie um JSON:
 ]
 ```
 
-`subject` aceita o código do assunto (veja `src/content/subjects.ts`) ou o nome. As questões que acompanham o app são originais, escritas a partir do Scrum Guide 2020 (CC BY-SA 4.0) e dos syllabi públicos de COBIT 2019, ITIL 4, ISTQB CTFL e editais de TI.
+`subject` aceita o código do assunto (veja `src/content/subjects.ts`) ou o nome.
+
+### Provas anteriores oficiais
+
+1. Baixe o caderno e o gabarito definitivo no site da banca para `provas/pdf/` (a pasta `provas/` fica fora do git: é material para uso pessoal).
+2. Extraia o texto: `pdftotext -enc UTF-8 provas/pdf/<arquivo>.pdf provas/txt/<arquivo>.txt`
+3. Descreva a prova em `provas/config.json` (formatos `fgv` e `ufsc`, título do bloco no gabarito, duração) e rode:
+   ```bash
+   python -X utf8 scripts/parse-prova.py --config provas/config.json
+   ```
+4. Importe `provas/json/<slug>.json` em **Banco de questões → Importar em lote**. A prova vira um simulado com todas as questões na ordem e no tempo originais. Questões repetidas entre provas (ex.: conhecimentos gerais iguais em vários perfis) são reaproveitadas, não duplicadas.
+
+O conversor exclui questões anuladas e as que dependem de figura sem texto, e marca com "[Confira … no PDF original]" as que têm código ou tabela cuja formatação pode ter se perdido. `npm test` valida os JSONs gerados quando a pasta existe. As questões que acompanham o app são originais, escritas a partir do Scrum Guide 2020 (CC BY-SA 4.0) e dos syllabi públicos de COBIT 2019, ITIL 4, ISTQB CTFL e editais de TI.
 
 ## Estrutura
 

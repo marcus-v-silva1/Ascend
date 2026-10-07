@@ -19,7 +19,7 @@ import { toQuestionRow } from "@/content/types";
 import type { Database } from "@/lib/supabase/database.types";
 
 /** Aumente quando adicionar conteúdo novo em src/content para ele chegar ao banco. */
-export const CONTENT_VERSION = 1;
+export const CONTENT_VERSION = 2;
 
 export const ALL_QUESTIONS = [
   ...PSM_QUESTIONS,
