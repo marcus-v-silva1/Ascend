@@ -8,6 +8,9 @@ import { averageMonthly, money, monthsToGoal, payoffPlan, toBRL } from "@/lib/fi
 import { cn } from "@/lib/utils";
 import { addFundEntry, createDebt, createFund, createPlannedCost, deletePlannedCost, payDebt, saveRates, togglePaidCost } from "./actions";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Finanças" };
 
 type Fund = { id: string; name: string; target_amount: number; currency: string; target_date: string | null };

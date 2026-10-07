@@ -4,6 +4,9 @@ import { requireUser } from "@/lib/auth";
 import { addDays, localDate, startOfLocalDay, weekStart } from "@/lib/dates";
 import { Pomodoro } from "./pomodoro";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Foco" };
 
 function hours(min: number) {

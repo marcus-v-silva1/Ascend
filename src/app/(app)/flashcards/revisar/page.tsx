@@ -4,6 +4,9 @@ import { getReviewQueue } from "@/lib/data/flashcards";
 import type { CardRow } from "@/lib/srs";
 import { ReviewSession } from "./review-session";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Revisar flashcards" };
 
 export default async function ReviewPage({ searchParams }: PageProps<"/flashcards/revisar">) {

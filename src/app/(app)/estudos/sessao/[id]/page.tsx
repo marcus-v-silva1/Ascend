@@ -4,6 +4,9 @@ import { requireUser } from "@/lib/auth";
 import { SessionLoader } from "./session-loader";
 import type { RunnerQuestion } from "./session-runner";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Sessão de estudo" };
 
 export default async function SessionPage({ params }: PageProps<"/estudos/sessao/[id]">) {

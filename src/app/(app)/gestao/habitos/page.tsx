@@ -7,6 +7,9 @@ import { lastNDays } from "@/lib/habits";
 import { archiveHabit, createHabit } from "../actions";
 import { HabitGrid, type HabitRow } from "./habit-grid";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Hábitos" };
 
 export default async function HabitsPage() {

@@ -7,6 +7,9 @@ import { addDays, formatDate, localDate, weekStart } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 import { addVocab, importTimesData, logActivity, setUnitStatus } from "./actions";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Inglês" };
 
 const KIND_LABEL: Record<string, string> = {

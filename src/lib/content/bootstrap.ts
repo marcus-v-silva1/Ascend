@@ -46,8 +46,21 @@ async function insertMissing(supabase: Client, table: string, rows: Record<strin
   if (rows.length === 0) return;
   const { error } = await untyped(supabase)
     .from(table)
-    .upsert(rows, { onConflict: "user_id,external_id", ignoreDuplicates: true });
+    // defaultToNull: false faz colunas ausentes em algumas linhas usarem o default do banco
+    .upsert(rows, { onConflict: "user_id,external_id", ignoreDuplicates: true, defaultToNull: false });
   if (error) throw new Error(`seed ${table}: ${error.message}`);
+}
+
+/** Preenche o assunto de questões do conteúdo inicial que ficaram sem (não mexe nas que já têm). */
+async function repairQuestionSubjects(supabase: Client, subjects: IdMap) {
+  const bySubject = new Map<string, string[]>();
+  for (const q of ALL_QUESTIONS) bySubject.set(q.subject, [...(bySubject.get(q.subject) ?? []), q.id]);
+  for (const [subject, ids] of bySubject) {
+    const subjectId = subjects.get(subject);
+    if (!subjectId) continue;
+    const { error } = await supabase.from("questions").update({ subject_id: subjectId }).in("external_id", ids).is("subject_id", null);
+    if (error) throw new Error(`seed questions/subject: ${error.message}`);
+  }
 }
 
 export async function seedContent(supabase: Client, userId: string) {
@@ -81,6 +94,7 @@ export async function seedContent(supabase: Client, userId: string) {
     "questions",
     withUser(ALL_QUESTIONS.map((q) => ({ ...toQuestionRow(q), subject_id: subjects.get(q.subject) ?? null }))),
   );
+  await repairQuestionSubjects(supabase, subjects);
 
   await insertMissing(
     supabase,

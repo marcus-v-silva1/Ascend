@@ -7,6 +7,9 @@ import { formatDate } from "@/lib/dates";
 import { deleteCard, deleteDeck, toggleSuspend } from "../actions";
 import { CardForm } from "../forms";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Deck" };
 
 const STATE = ["novo", "aprendendo", "revisão", "reaprendendo"];

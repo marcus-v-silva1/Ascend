@@ -7,6 +7,9 @@ import { getExamsOverview } from "@/lib/data/study";
 import { isExamReady } from "@/lib/study";
 import { StartForm } from "./start-form";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Questões" };
 
 function Meter({ value, max, className }: { value: number; max: number; className?: string }) {

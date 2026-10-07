@@ -5,6 +5,9 @@ import { requireUser } from "@/lib/auth";
 import { addDays, formatDate, localDate, startOfLocalDay, weekStart } from "@/lib/dates";
 import { saveWeeklyReview } from "../actions";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Revisão semanal" };
 
 type Review = { week_start: string; wins: string | null; lessons: string | null; blockers: string | null; next_focus: string | null; energy: number | null };

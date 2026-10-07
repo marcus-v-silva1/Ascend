@@ -11,6 +11,9 @@ import { cn } from "@/lib/utils";
 import { QuestionsChart, type DayPoint } from "./questions-chart";
 import { TodayHabits } from "./today-habits";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Hoje" };
 
 const DAILY_QUESTIONS = 20;

@@ -3,6 +3,10 @@ import { MobileNav, Sidebar } from "@/components/app-nav";
 import { requireUser } from "@/lib/auth";
 import { ensureContent } from "@/lib/content/bootstrap";
 
+// Área logada: tudo depende do usuário e do relógio, então a navegação pode esperar os dados
+// (o loading.tsx mostra um esqueleto enquanto isso).
+export const instant = false;
+
 /** Confere o dono e carrega o conteúdo inicial antes de qualquer página. */
 async function Gate({ children }: { children: React.ReactNode }) {
   const { supabase, userId } = await requireUser();

@@ -5,6 +5,9 @@ import { requireUser } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { WhyWrongForm } from "./why-wrong-form";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Resultado" };
 
 type Option = { id: string; text: string };
@@ -102,7 +105,7 @@ export default async function ResultPage({ params }: PageProps<"/estudos/sessao/
                   <p className="text-xs text-muted-foreground">{i + 1}. {r.questions.subjects?.name}</p>
                   <p className="mt-1 font-medium whitespace-pre-line">{r.questions.stem}</p>
                   <ul className="mt-3 space-y-1 text-sm">
-                    {r.questions.options.map((o) => (
+                    {r.questions.options.map((o, oi) => (
                       <li
                         key={o.id}
                         className={cn(
@@ -112,6 +115,7 @@ export default async function ResultPage({ params }: PageProps<"/estudos/sessao/
                           !correct.has(o.id) && !chosen.has(o.id) && "text-muted-foreground",
                         )}
                       >
+                        {r.questions.options.length > 2 && <span className="mr-1.5 font-medium">{String.fromCharCode(65 + oi)})</span>}
                         {o.text}
                       </li>
                     ))}

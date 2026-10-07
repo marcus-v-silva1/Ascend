@@ -5,6 +5,9 @@ import { requireUser } from "@/lib/auth";
 import { createTask } from "./actions";
 import { KanbanBoard, type Task } from "./kanban-board";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Tarefas" };
 
 export default async function TasksPage() {

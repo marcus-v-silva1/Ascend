@@ -6,6 +6,9 @@ import { requireUser } from "@/lib/auth";
 import { countDueToday, getDeckSummaries } from "@/lib/data/flashcards";
 import { CardForm, DeckForm, ImportCardsForm } from "./forms";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Flashcards" };
 
 export default async function FlashcardsPage() {

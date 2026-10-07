@@ -56,15 +56,17 @@ function ActiveNavLinks({ onNavigate }: { onNavigate?: () => void }) {
 
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
-  const dark = resolvedTheme === "dark";
+  // Ícone e texto decididos por CSS (classe .dark no <html>): servidor e cliente geram o mesmo HTML
   return (
     <button
       type="button"
-      onClick={() => setTheme(dark ? "light" : "dark")}
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
       className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent/60"
     >
-      {dark ? <Sun className="size-4" aria-hidden /> : <Moon className="size-4" aria-hidden />}
-      {dark ? "Tema claro" : "Tema escuro"}
+      <Sun className="hidden size-4 dark:block" aria-hidden />
+      <Moon className="size-4 dark:hidden" aria-hidden />
+      <span className="hidden dark:inline">Tema claro</span>
+      <span className="dark:hidden">Tema escuro</span>
     </button>
   );
 }

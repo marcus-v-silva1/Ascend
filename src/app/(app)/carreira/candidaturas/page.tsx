@@ -7,6 +7,9 @@ import { formatDate, localDate, relativeDays } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 import { createApplication, deleteApplication, setApplicationStatus } from "../actions";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Candidaturas" };
 
 const COLUMNS = [

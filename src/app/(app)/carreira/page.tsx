@@ -17,6 +17,9 @@ import {
   updateIntention,
 } from "./actions";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Carreira" };
 
 type Track = { id: string; external_id: string | null; name: string; description: string | null; color: string | null };

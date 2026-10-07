@@ -187,7 +187,8 @@ export function SessionRunner({
   }, [q, fb, mode, index, questions.length, toggle, submitPractice, go]);
 
   const isLast = index === questions.length - 1;
-  const remaining = deadline ? deadline - now : null;
+  // Diferença de relógio entre servidor e navegador não pode passar do tempo da prova
+  const remaining = deadline ? Math.min(deadline - now, (durationMin ?? 0) * 60_000) : null;
   const lowTime = remaining !== null && remaining < 5 * 60_000;
 
   const optionState = useMemo(() => {
@@ -261,7 +262,7 @@ export function SessionRunner({
                     )}
                     aria-hidden
                   >
-                    {st === "correct" ? <Check className="size-3.5" /> : st === "wrong" ? <X className="size-3.5" /> : i + 1}
+                    {st === "correct" ? <Check className="size-3.5" /> : st === "wrong" ? <X className="size-3.5" /> : q.type === "truefalse" ? i + 1 : String.fromCharCode(65 + i)}
                   </span>
                   <span className="leading-relaxed">{o.text}</span>
                 </button>

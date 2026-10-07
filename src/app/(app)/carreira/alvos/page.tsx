@@ -3,6 +3,9 @@ import { PageHeader } from "@/components/page-header";
 import { requireUser } from "@/lib/auth";
 import { TargetsBoard, type Target } from "./targets-board";
 
+// Página com dados do usuário: pode esperar os dados (o loading.tsx mostra o esqueleto)
+export const instant = false;
+
 export const metadata: Metadata = { title: "Concursos e países" };
 
 export default async function TargetsPage() {
