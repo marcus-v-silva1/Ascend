@@ -95,14 +95,8 @@ export function ReviewSession({ cards, deckName }: { cards: Card[]; deckName: st
         <span className="num">{done} feitos · {queue.length} restantes</span>
       </div>
 
-      <div
-        className="min-h-72 rounded-xl border bg-card p-6 sm:p-10"
-        role="button"
-        tabIndex={0}
-        aria-label={revealed ? "Cartão revelado" : "Mostrar resposta"}
-        onClick={() => setRevealed(true)}
-        onKeyDown={() => undefined}
-      >
+      {/* Clique no cartão é atalho de mouse; teclado e leitor de tela usam o botão abaixo */}
+      <div className="min-h-72 rounded-xl border bg-card p-6 sm:p-10" onClick={() => setRevealed(true)}>
         {card.state === 0 && <span className="mb-3 inline-block rounded bg-accent px-1.5 py-0.5 text-xs text-accent-foreground">novo</span>}
         <p className="text-lg leading-relaxed whitespace-pre-line sm:text-xl">{card.front}</p>
         {revealed && (

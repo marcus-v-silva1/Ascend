@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Glow-Up
 
-## Getting Started
+App pessoal para estudos, carreira, hábitos e finanças: questões e simulados com revisão espaçada, flashcards (FSRS), plano de carreira com OKRs, ranking de concursos e rotas para a Europa, Kanban, hábitos, Pomodoro, revisão semanal, reserva de mudança e acompanhamento do inglês.
 
-First, run the development server:
+Stack: Next.js 16 (App Router, Cache Components) · TypeScript · Tailwind 4 + shadcn/ui (Base UI) · Supabase (Postgres, Auth, RLS) · ts-fsrs · Vitest · Playwright · Vercel.
+
+## Rodar localmente
+
+Pré-requisitos: Node 24 e, para o banco local, Docker Desktop.
 
 ```bash
+npm install
+cp .env.example .env.local
+npm run db:start        # sobe o Supabase local e aplica as migrations
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`npm run db:start` imprime `API URL` e `anon key`; cole em `.env.local`. Crie seu usuário no Studio local (http://127.0.0.1:54323 → Authentication → Add user, com senha) usando o mesmo e-mail de `OWNER_EMAIL`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+No primeiro login o app carrega sozinho o conteúdo inicial (trilhas, metas, alvos, hábitos, 162 questões e decks). Novos conteúdos em `src/content` chegam ao banco quando você aumenta `CONTENT_VERSION` em `src/lib/content/bootstrap.ts`; o seed só insere o que falta e nunca sobrescreve suas edições.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deploy (Supabase + Vercel)
 
-## Learn More
+1. **Supabase**: crie um projeto em supabase.com e aplique o schema:
+   ```bash
+   npx supabase login
+   npx supabase link --project-ref <ref-do-projeto>
+   npx supabase db push
+   ```
+2. **Usuário dono**: Authentication → Users → *Add user* com seu e-mail e senha (marque *Auto confirm*).
+3. **Fechar cadastros**: Authentication → Sign In / Providers → desative *Allow new users to sign up*. O app também barra qualquer e-mail diferente de `OWNER_EMAIL`, e o RLS isola os dados por usuário.
+4. **URLs de auth**: Authentication → URL Configuration → *Site URL* = URL da Vercel; adicione `https://<seu-app>.vercel.app/auth/callback` em *Redirect URLs* (necessário para o login por link).
+5. **Vercel**: importe o repositório do GitHub e configure as variáveis:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `OWNER_EMAIL`
 
-To learn more about Next.js, take a look at the following resources:
+   Cada PR ganha um deploy de preview; o push na `main` vai para produção.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Comando | O que faz |
+|---|---|
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run lint` / `npm run typecheck` | ESLint e TypeScript |
+| `npm test` | Testes unitários (Vitest): FSRS, correção, seleção intercalada, finanças, hábitos, CSV e validação de todo o conteúdo |
+| `npm run test:e2e` | Testes E2E (Playwright) contra Supabase **local** |
+| `npm run db:types` | Gera tipos TypeScript a partir do banco local |
+| `npm run times:sync` | Sincroniza seu progresso da Times (veja abaixo) |
 
-## Deploy on Vercel
+### Testes E2E
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Precisam do Supabase local rodando e destas variáveis (valores de teste, nunca de produção):
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key local>
+SUPABASE_SERVICE_ROLE_KEY=<service role key local>
+OWNER_EMAIL=e2e-owner@glowup.test
+E2E_PASSWORD=<qualquer senha de teste>
+```
+
+O setup cria o usuário de teste e salva a sessão. No GitHub Actions isso é automático (`.github/workflows/ci.yml`).
+
+## Inglês: sincronização com a Times
+
+```bash
+npm run times:sync
+```
+
+Abre um navegador com perfil próprio (`.times-session/`, fora do git). Você faz login na Times Digital Books e na Times Connected, navega pelos seus cursos e fecha a janela. O script grava as respostas das plataformas em `.times-data/raw/` e gera `times-export.json`, que você importa em **Inglês → Importar times-export.json**. A senha é digitada só por você no navegador e nunca fica no código.
+
+O mapeamento das respostas é heurístico até conhecermos o formato exato das APIs da Times. Se a importação vier vazia, os arquivos de `.times-data/raw/` mostram o formato para ajustar `scripts/times-sync.mjs`.
+
+## Importar questões
+
+Em **Questões → Banco de questões → Importar em lote**, envie um JSON:
+
+```json
+[
+  {
+    "subject": "conc-redes",
+    "stem": "O protocolo DNS usa a porta 53.",
+    "correct": true,
+    "explanation": "DNS usa a porta 53 (UDP e TCP).",
+    "board": "Cebraspe",
+    "year": 2024
+  },
+  {
+    "subject": "psm-eventos",
+    "stem": "Qual é o timebox da Daily Scrum?",
+    "options": ["15 minutos", "30 minutos", "1 hora"],
+    "correct": [0],
+    "explanation": "A Daily Scrum tem 15 minutos."
+  }
+]
+```
+
+`subject` aceita o código do assunto (veja `src/content/subjects.ts`) ou o nome. As questões que acompanham o app são originais, escritas a partir do Scrum Guide 2020 (CC BY-SA 4.0) e dos syllabi públicos de COBIT 2019, ITIL 4, ISTQB CTFL e editais de TI.
+
+## Estrutura
+
+```
+src/app/(app)/        páginas autenticadas (dashboard, estudos, flashcards, inglês, carreira, gestão, finanças)
+src/app/login/        login por senha ou link mágico
+src/content/          conteúdo inicial versionado (plano, questões, decks)
+src/lib/              regras puras e testadas (srs, grading, study, finance, habits, csv, dates)
+src/proxy.ts          renova a sessão e barra quem não é o dono
+supabase/migrations/  schema com RLS
+tests/unit, tests/e2e
+```
