@@ -6,7 +6,7 @@ import { z } from "zod";
 import { isOwner } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 
-export type LoginState = { error?: string; sent?: boolean };
+export type LoginState = { error?: string; sent?: boolean; email?: string };
 
 const schema = z.object({
   email: z.email("Informe um e-mail válido."),
@@ -20,17 +20,17 @@ function safeNext(next: string | undefined) {
 
 export async function signIn(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const parsed = schema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  if (!parsed.success) return { error: parsed.error.issues[0].message, email: String(formData.get("email") ?? "") };
   const { email, password, next } = parsed.data;
 
   // Mesma mensagem para e-mail desconhecido e senha errada: não revela quem é o dono.
-  if (!isOwner(email)) return { error: "E-mail ou senha incorretos." };
+  if (!isOwner(email)) return { error: "E-mail ou senha incorretos.", email };
 
   const supabase = await createClient();
 
   if (password) {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return { error: "E-mail ou senha incorretos." };
+    if (error) return { error: "E-mail ou senha incorretos.", email };
     redirect(safeNext(next));
   }
 
@@ -42,7 +42,7 @@ export async function signIn(_prev: LoginState, formData: FormData): Promise<Log
       emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(safeNext(next))}`,
     },
   });
-  if (error) return { error: "Não foi possível enviar o link. Tente de novo em instantes." };
+  if (error) return { error: "Não foi possível enviar o link. Tente de novo em instantes.", email };
   return { sent: true };
 }
 

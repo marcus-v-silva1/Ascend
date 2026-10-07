@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { signIn, type LoginState } from "./actions";
 
@@ -9,6 +9,7 @@ export function LoginForm({ next, initialError }: { next?: string; initialError?
     error: initialError,
   });
   const [useLink, setUseLink] = useState(false);
+  const id = useId();
 
   if (state.sent) {
     return (
@@ -22,13 +23,13 @@ export function LoginForm({ next, initialError }: { next?: string; initialError?
     <form action={action} className="space-y-4">
       <input type="hidden" name="next" value={next ?? ""} />
       <div>
-        <label htmlFor="email" className="field-label">E-mail</label>
-        <input id="email" name="email" type="email" autoComplete="email" required className="field" />
+        <label htmlFor={`${id}-email`} className="field-label">E-mail</label>
+        <input id={`${id}-email`} name="email" type="email" autoComplete="email" required defaultValue={state.email} className="field" />
       </div>
       {!useLink && (
         <div>
-          <label htmlFor="password" className="field-label">Senha</label>
-          <input id="password" name="password" type="password" autoComplete="current-password" required className="field" />
+          <label htmlFor={`${id}-password`} className="field-label">Senha</label>
+          <input id={`${id}-password`} name="password" type="password" autoComplete="current-password" required className="field" />
         </div>
       )}
       {state.error && (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useId, useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -70,7 +70,7 @@ export function Field({
   placeholder?: string;
   className?: string;
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "defaultValue">) {
-  const id = `f-${name}-${label}`.replace(/\W+/g, "-");
+  const id = useId();
   return (
     <div className={className}>
       <label htmlFor={id} className="field-label">{label}</label>
