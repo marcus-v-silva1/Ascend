@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 import { useTheme } from "next-themes";
 import { LogOut, Menu, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -14,8 +15,7 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
-  const pathname = usePathname();
+function NavLinks({ onNavigate, pathname }: { onNavigate?: () => void; pathname: string }) {
   return (
     <nav className="space-y-6" aria-label="Principal">
       {NAV_GROUPS.map((group) => (
@@ -50,6 +50,10 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
+function ActiveNavLinks({ onNavigate }: { onNavigate?: () => void }) {
+  return <NavLinks onNavigate={onNavigate} pathname={usePathname()} />;
+}
+
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
   const dark = resolvedTheme === "dark";
@@ -72,7 +76,9 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
         Glow-Up
       </Link>
       <div className="flex-1 overflow-y-auto">
-        <NavLinks onNavigate={onNavigate} />
+        <Suspense fallback={<NavLinks pathname="" />}>
+          <ActiveNavLinks onNavigate={onNavigate} />
+        </Suspense>
       </div>
       <div className="mt-4 space-y-0.5 border-t border-sidebar-border pt-4">
         <ThemeToggle />
@@ -99,7 +105,18 @@ export function Sidebar() {
 }
 
 export function MobileNav() {
-  const pathname = usePathname();
+  return (
+    <Suspense fallback={<MobileNavInner pathname="" />}>
+      <ActiveMobileNav />
+    </Suspense>
+  );
+}
+
+function ActiveMobileNav() {
+  return <MobileNavInner pathname={usePathname()} />;
+}
+
+function MobileNavInner({ pathname }: { pathname: string }) {
   const items: NavItem[] = NAV_GROUPS.flatMap((g) => g.items).filter((i) => i.mobile);
   return (
     <nav

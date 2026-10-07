@@ -57,8 +57,8 @@ export async function importQuestions(_prev: ImportState, formData: FormData): P
     if (typeof correct !== "boolean" && correct.some((c) => c >= (item.options?.length ?? 0))) {
       return { error: `Item ${i}: gabarito aponta para alternativa inexistente.` };
     }
-    const { external_id: _ignored, ...row } = toQuestionRow({ ...item, id: "", correct, explanation: item.explanation, difficulty: item.difficulty as SeedQuestion["difficulty"] });
-    rows.push({ ...row, subject_id: subjectId });
+    const row = toQuestionRow({ ...item, id: "", correct, explanation: item.explanation, difficulty: item.difficulty as SeedQuestion["difficulty"] });
+    rows.push({ ...row, external_id: null, subject_id: subjectId });
   }
 
   const { error } = await supabase.from("questions").insert(rows);
@@ -105,8 +105,7 @@ export async function createQuestion(_prev: CreateState, formData: FormData): Pr
     if (correctIdx.length === 0) return { error: "Marque a(s) alternativa(s) correta(s)." };
     row = toQuestionRow({ id: "", subject: "", stem: d.stem, options: filled.map((f) => f.text), correct: correctIdx, explanation: d.explanation ?? "", source: d.source });
   }
-  const { external_id: _ignored, ...insert } = row;
-  const { error } = await supabase.from("questions").insert({ ...insert, subject_id: d.subjectId, source: d.source ?? "Minha questão" });
+  const { error } = await supabase.from("questions").insert({ ...row, external_id: null, subject_id: d.subjectId, source: d.source ?? "Minha questão" });
   if (error) return { error: "Não foi possível salvar." };
   revalidatePath("/estudos", "layout");
   return { ok: true };

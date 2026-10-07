@@ -48,20 +48,32 @@ export function SessionRunner({
     const first = questions.findIndex((q) => !done.has(q.id));
     return first === -1 ? 0 : first;
   });
-  const [selected, setSelected] = useState<Record<string, string[]>>({});
-  const [times, setTimes] = useState<Record<string, number>>({});
-  const [flagged, setFlagged] = useState<Set<string>>(new Set());
+  const [restored] = useState(() => {
+    if (mode !== "mock") return null;
+    try {
+      const raw = localStorage.getItem(storageKey);
+      return raw ? (JSON.parse(raw) as { selected: Record<string, string[]>; times: Record<string, number>; flagged: string[] }) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [selected, setSelected] = useState<Record<string, string[]>>(restored?.selected ?? {});
+  const [times, setTimes] = useState<Record<string, number>>(restored?.times ?? {});
+  const [flagged, setFlagged] = useState<Set<string>>(new Set(restored?.flagged ?? []));
   const [feedback, setFeedback] = useState<Record<string, Feedback>>({});
   const [why, setWhy] = useState("");
   const [savedWhy, setSavedWhy] = useState<Set<string>>(new Set());
   const [pending, startTransition] = useTransition();
   const router = useRouter();
   const [now, setNow] = useState(() => Date.now());
-  const questionStart = useRef(Date.now());
+  const questionStart = useRef(0);
+  useEffect(() => {
+    questionStart.current = Date.now();
+  }, []);
   const finishing = useRef(false);
 
   const q = questions[index];
-  const current = selected[q?.id] ?? [];
+  const current = useMemo(() => selected[q?.id] ?? [], [selected, q?.id]);
   const fb = q ? feedback[q.id] : undefined;
   const deadline = durationMin ? new Date(startedAt).getTime() + durationMin * 60_000 : null;
   const answeredCount = mode === "mock"
@@ -69,21 +81,6 @@ export function SessionRunner({
     : Object.keys(feedback).length + alreadyAnswered.length;
 
   // Simulado: respostas sobrevivem a recarregar a página
-  useEffect(() => {
-    if (mode !== "mock") return;
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) {
-        const saved = JSON.parse(raw) as { selected: Record<string, string[]>; times: Record<string, number>; flagged: string[] };
-        setSelected(saved.selected ?? {});
-        setTimes(saved.times ?? {});
-        setFlagged(new Set(saved.flagged ?? []));
-      }
-    } catch {
-      // armazenamento indisponível: segue sem restaurar
-    }
-  }, [mode, storageKey]);
-
   useEffect(() => {
     if (mode !== "mock") return;
     try {

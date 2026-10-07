@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { SessionRunner, type RunnerQuestion } from "./session-runner";
+import { SessionLoader } from "./session-loader";
+import type { RunnerQuestion } from "./session-runner";
 
 export const metadata: Metadata = { title: "Sessão de estudo" };
 
@@ -40,7 +41,7 @@ export default async function SessionPage({ params }: PageProps<"/estudos/sessao
     .eq("session_id", id);
 
   return (
-    <SessionRunner
+    <SessionLoader
       sessionId={session.id}
       mode={session.mode as "practice" | "mock"}
       questions={questions}
