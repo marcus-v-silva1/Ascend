@@ -52,3 +52,20 @@ test("finanças: aporte atualiza a reserva", async ({ page }) => {
   await fund.getByRole("button", { name: "Registrar" }).click();
   await expect(page.getByText("Aporte registrado.")).toBeVisible();
 });
+
+test("roadmap: abre um tópico, marca e volta ao automático", async ({ page }) => {
+  await page.goto("/roadmap");
+  await expect(page.getByRole("heading", { name: "Rumo à Europa como QA Engineer" })).toBeVisible();
+  await page.getByRole("button", { name: /^Certificação PSM I/ }).click();
+  const panel = page.getByRole("dialog");
+  await expect(panel.getByText("Antes, conclua")).toBeVisible();
+  await panel.getByRole("button", { name: "Fazendo" }).click();
+  await expect(panel.getByRole("button", { name: "Fazendo" })).toHaveAttribute("aria-pressed", "true");
+  await panel.getByRole("button", { name: "Automático" }).click();
+  await expect(panel.getByRole("button", { name: "Automático" })).toHaveAttribute("aria-pressed", "true");
+});
+
+test("perfil: nome aparece na saudação", async ({ page }) => {
+  await page.goto("/perfil");
+  await expect(page.getByLabel("Como quer ser chamado")).toBeVisible();
+});

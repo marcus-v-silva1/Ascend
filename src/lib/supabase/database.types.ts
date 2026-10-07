@@ -1021,6 +1021,70 @@ export type Database = {
           },
         ];
       };
+      roadmap_nodes: {
+        Row: {
+          app_href: string | null;
+          created_at: string;
+          description: string | null;
+          external_id: string;
+          id: string;
+          kind: Database["public"]["Enums"]["roadmap_node_kind"];
+          link_ref: string | null;
+          link_type: Database["public"]["Enums"]["roadmap_link"];
+          notes: string | null;
+          parent_external_id: string | null;
+          position: number;
+          requires: string[];
+          resources: NonNullable<Json>;
+          roadmap: string;
+          side: string | null;
+          status: Database["public"]["Enums"]["roadmap_status"] | null;
+          title: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          app_href?: string | null;
+          created_at?: string;
+          description?: string | null;
+          external_id: string;
+          id?: string;
+          kind?: Database["public"]["Enums"]["roadmap_node_kind"];
+          link_ref?: string | null;
+          link_type?: Database["public"]["Enums"]["roadmap_link"];
+          notes?: string | null;
+          parent_external_id?: string | null;
+          position?: number;
+          requires?: string[];
+          resources?: NonNullable<Json>;
+          roadmap: string;
+          side?: string | null;
+          status?: Database["public"]["Enums"]["roadmap_status"] | null;
+          title: string;
+          user_id?: string;
+        };
+        Update: {
+          app_href?: string | null;
+          created_at?: string;
+          description?: string | null;
+          external_id?: string;
+          id?: string;
+          kind?: Database["public"]["Enums"]["roadmap_node_kind"];
+          link_ref?: string | null;
+          link_type?: Database["public"]["Enums"]["roadmap_link"];
+          notes?: string | null;
+          parent_external_id?: string | null;
+          position?: number;
+          requires?: string[];
+          resources?: NonNullable<Json>;
+          roadmap?: string;
+          side?: string | null;
+          status?: Database["public"]["Enums"]["roadmap_status"] | null;
+          title?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       study_sessions: {
         Row: {
           correct_count: number | null;
@@ -1392,6 +1456,16 @@ export type Database = {
       english_platform: "times_digital_books" | "times_connected" | "other";
       goal_status: "active" | "done" | "paused" | "dropped";
       question_type: "single" | "multi" | "truefalse";
+      roadmap_link:
+        | "subject"
+        | "goal"
+        | "key_result"
+        | "milestone"
+        | "english_unit"
+        | "fund"
+        | "none";
+      roadmap_node_kind: "goal" | "stage" | "topic";
+      roadmap_status: "todo" | "doing" | "done" | "skipped";
       session_mode: "practice" | "mock" | "review";
       subject_kind: "exam" | "discipline" | "topic";
       target_kind: "concurso" | "country" | "company" | "certification";
@@ -1545,6 +1619,17 @@ export const Constants = {
       english_platform: ["times_digital_books", "times_connected", "other"],
       goal_status: ["active", "done", "paused", "dropped"],
       question_type: ["single", "multi", "truefalse"],
+      roadmap_link: [
+        "subject",
+        "goal",
+        "key_result",
+        "milestone",
+        "english_unit",
+        "fund",
+        "none",
+      ],
+      roadmap_node_kind: ["goal", "stage", "topic"],
+      roadmap_status: ["todo", "doing", "done", "skipped"],
       session_mode: ["practice", "mock", "review"],
       subject_kind: ["exam", "discipline", "topic"],
       target_kind: ["concurso", "country", "company", "certification"],

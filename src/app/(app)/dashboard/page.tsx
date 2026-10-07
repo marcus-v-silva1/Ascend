@@ -4,6 +4,8 @@ import { ContourLines } from "@/components/brand";
 import { LinkButton } from "@/components/link-button";
 import { requireUser } from "@/lib/auth";
 import { countDueToday } from "@/lib/data/flashcards";
+import { getRoadmap } from "@/lib/data/roadmap";
+import { nextSteps, roadmapSummary } from "@/lib/roadmap";
 import { getExamsOverview } from "@/lib/data/study";
 import { addDays, daysUntil, formatDate, localDate, relativeDays, startOfLocalDay, weekStart } from "@/lib/dates";
 import { money } from "@/lib/finance";
@@ -33,6 +35,7 @@ export default async function DashboardPage() {
   const since = addDays(today, -13);
 
   const [
+    roadmap,
     cards,
     exams,
     { data: profile },
@@ -48,6 +51,7 @@ export default async function DashboardPage() {
     { data: funds },
     { data: entries },
   ] = await Promise.all([
+    getRoadmap(supabase, "europa"),
     countDueToday(supabase, userId),
     getExamsOverview(supabase),
     supabase.from("profiles").select("display_name").eq("id", userId).maybeSingle(),
@@ -240,6 +244,36 @@ export default async function DashboardPage() {
         </div>
 
         <aside className="space-y-8">
+          {roadmap.length > 0 && (() => {
+            const summary = roadmapSummary(roadmap);
+            const steps = nextSteps(roadmap, 3);
+            return (
+              <section aria-labelledby="roadmap-card" className="rounded-lg border bg-card p-4">
+                <div className="flex items-baseline justify-between">
+                  <h2 id="roadmap-card" className="font-semibold">Rumo à Europa</h2>
+                  <span className="num text-sm text-muted-foreground">{summary.done}/{summary.total}</span>
+                </div>
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted" aria-hidden>
+                  <div className="h-full rounded-full bg-success" style={{ width: `${summary.pct}%` }} />
+                </div>
+                {steps.length > 0 && (
+                  <>
+                    <p className="mt-3 text-xs text-muted-foreground">Próximos passos</p>
+                    <ul className="mt-1 space-y-1 text-sm">
+                      {steps.map((st) => (
+                        <li key={st.external_id} className="flex items-center gap-2">
+                          <span className={cn("size-1.5 shrink-0 rounded-full", st.effective === "doing" ? "bg-summit" : "bg-muted-foreground/40")} aria-hidden />
+                          {st.title}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+                <LinkButton href="/roadmap" variant="link" size="sm" className="mt-1 px-0">Ver roadmap</LinkButton>
+              </section>
+            );
+          })()}
+
           <section aria-labelledby="habits-today">
             <div className="mb-2 flex items-baseline justify-between">
               <h2 id="habits-today" className="font-semibold">Hábitos de hoje</h2>

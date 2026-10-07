@@ -7,6 +7,7 @@ type Client = SupabaseClient<Database>;
 
 export type SubjectRow = {
   id: string;
+  external_id: string | null;
   parent_id: string | null;
   name: string;
   kind: "exam" | "discipline" | "topic";
@@ -17,7 +18,7 @@ export type SubjectRow = {
 export async function getSubjects(supabase: Client): Promise<SubjectRow[]> {
   const { data, error } = await supabase
     .from("subjects")
-    .select("id, parent_id, name, kind, description, position")
+    .select("id, external_id, parent_id, name, kind, description, position")
     .order("position");
   if (error) throw error;
   return data ?? [];

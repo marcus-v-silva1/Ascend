@@ -14,12 +14,13 @@ import {
 import { COBIT_QUESTIONS, ITIL_QUESTIONS } from "@/content/questions/cobit-itil";
 import { CONCURSO_QUESTIONS, ISTQB_QUESTIONS } from "@/content/questions/istqb-concursos";
 import { PSM_QUESTIONS } from "@/content/questions/psm";
+import { ROADMAP_NODES } from "@/content/roadmap";
 import { PRESETS, SUBJECTS } from "@/content/subjects";
 import { toQuestionRow } from "@/content/types";
 import type { Database } from "@/lib/supabase/database.types";
 
 /** Aumente quando adicionar conteúdo novo em src/content para ele chegar ao banco. */
-export const CONTENT_VERSION = 2;
+export const CONTENT_VERSION = 3;
 
 export const ALL_QUESTIONS = [
   ...PSM_QUESTIONS,
@@ -211,6 +212,34 @@ export async function seedContent(supabase: Client, userId: string) {
   );
 
   await insertMissing(supabase, "habits", withUser([...HABITS]));
+
+  const positions = new Map<string, number>();
+  await insertMissing(
+    supabase,
+    "roadmap_nodes",
+    withUser(
+      ROADMAP_NODES.map((n) => {
+        const pos = positions.get(n.roadmap) ?? 0;
+        positions.set(n.roadmap, pos + 1);
+        return {
+          external_id: n.id,
+          roadmap: n.roadmap,
+          parent_external_id: n.parent ?? null,
+          kind: n.kind,
+          title: n.title,
+          description: n.description ?? null,
+          position: pos,
+          side: n.side ?? null,
+          status: n.status ?? null,
+          link_type: n.link?.type ?? "none",
+          link_ref: n.link?.ref ?? null,
+          requires: n.requires ?? [],
+          resources: n.resources ?? [],
+          app_href: n.href ?? null,
+        };
+      }),
+    ),
+  );
   await insertMissing(supabase, "funds", withUser([...FUNDS]));
   await insertMissing(
     supabase,

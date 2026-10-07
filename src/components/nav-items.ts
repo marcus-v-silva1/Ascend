@@ -7,6 +7,8 @@ import {
   ListChecks,
   NotebookPen,
   Repeat,
+  Route,
+  UserRound,
   SquareKanban,
   Timer,
   Wallet,
@@ -28,7 +30,8 @@ export const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
   {
     label: "Planejar",
     items: [
-      { href: "/carreira", label: "Carreira", icon: Compass, mobile: true },
+      { href: "/roadmap", label: "Roadmap", icon: Route, mobile: true },
+      { href: "/carreira", label: "Carreira", icon: Compass },
       { href: "/gestao", label: "Tarefas", icon: SquareKanban },
       { href: "/gestao/habitos", label: "Hábitos", icon: Repeat },
       { href: "/gestao/foco", label: "Foco", icon: Timer },
@@ -38,6 +41,9 @@ export const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
   },
   {
     label: "Método",
-    items: [{ href: "/como-estudar", label: "Como estudar", icon: BookOpen }],
+    items: [
+      { href: "/como-estudar", label: "Como estudar", icon: BookOpen },
+      { href: "/perfil", label: "Perfil", icon: UserRound },
+    ],
   },
 ];
