@@ -34,7 +34,7 @@ export async function getQuestionProgress(supabase: Client, subjectIds?: string[
   if (error) throw error;
   if (mErr) throw mErr;
 
-  const byQuestion = new Map((mastery ?? []).map((m: { question_id: string }) => [m.question_id, m]));
+  const byQuestion = new Map((mastery ?? []).map((m) => [m.question_id ?? "", m]));
   return (questions ?? []).map((q: { id: string; subject_id: string | null }) => {
     const m = byQuestion.get(q.id) as
       | { correct_days: number; last_correct: boolean; attempts: number }
@@ -84,7 +84,7 @@ export async function getExamsOverview(supabase: Client): Promise<ExamOverview[]
   ]);
 
   const stats = new Map(
-    (statsRes.data ?? []).map((s: { subject_id: string; attempts: number; correct: number }) => [s.subject_id, s]),
+    (statsRes.data ?? []).map((s) => [s.subject_id ?? "", { attempts: s.attempts ?? 0, correct: s.correct ?? 0 }]),
   );
 
   const summarize = (ids: string[]) => {
@@ -113,11 +113,11 @@ export async function getExamsOverview(supabase: Client): Promise<ExamOverview[]
       const children = subjects.filter((s) => s.parent_id === exam.id);
       const presets = (presetsRes.data ?? [])
         .filter((p: { subject_id: string | null }) => p.subject_id === exam.id)
-        .map((p: Omit<ExamOverview["presets"][number], "lastScores"> & { subject_id: string }) => ({
+        .map((p) => ({
           ...p,
           lastScores: (sessionsRes.data ?? [])
             .filter((s: { preset_id: string | null }) => s.preset_id === p.id)
-            .map((s: { score_pct: number }) => Number(s.score_pct)),
+            .map((s) => Number(s.score_pct ?? 0)),
         }));
       return {
         subject: exam,

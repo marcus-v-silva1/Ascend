@@ -32,8 +32,11 @@ export const ALL_QUESTIONS = [
 type Client = SupabaseClient<Database>;
 type IdMap = Map<string, string>;
 
+// Os helpers genéricos recebem o nome da tabela em tempo de execução; usam o cliente sem tipos.
+const untyped = (supabase: Client) => supabase as unknown as SupabaseClient;
+
 async function idMap(supabase: Client, table: string): Promise<IdMap> {
-  const { data, error } = await supabase.from(table).select("id, external_id").not("external_id", "is", null);
+  const { data, error } = await untyped(supabase).from(table).select("id, external_id").not("external_id", "is", null);
   if (error) throw error;
   return new Map((data ?? []).map((r: { id: string; external_id: string }) => [r.external_id, r.id]));
 }
@@ -41,7 +44,7 @@ async function idMap(supabase: Client, table: string): Promise<IdMap> {
 /** Insere apenas linhas cujo external_id ainda não existe (preserva edições do usuário). */
 async function insertMissing(supabase: Client, table: string, rows: Record<string, unknown>[]) {
   if (rows.length === 0) return;
-  const { error } = await supabase
+  const { error } = await untyped(supabase)
     .from(table)
     .upsert(rows, { onConflict: "user_id,external_id", ignoreDuplicates: true });
   if (error) throw new Error(`seed ${table}: ${error.message}`);

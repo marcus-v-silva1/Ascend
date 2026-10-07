@@ -16,7 +16,8 @@
     "db:reset": "supabase db reset",
     "db:types": "supabase gen types typescript --local > src/lib/supabase/database.types.ts",
     "times:sync": "node scripts/times-sync.mjs",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "db:types:remote": "supabase gen types typescript --db-url \"$SUPABASE_DB_URL\" --schema public > src/lib/supabase/database.types.ts && prettier --write src/lib/supabase/database.types.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

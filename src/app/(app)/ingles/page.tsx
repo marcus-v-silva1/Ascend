@@ -54,7 +54,7 @@ export default async function EnglishPage() {
   const maxWeek = Math.max(150, ...perWeek.map((w) => w.minutes));
   const targetHours = 300;
   const hours = Math.floor(totalMin / 60);
-  const deckId = (ext: string) => (decks ?? []).find((d: { external_id: string }) => d.external_id === ext)?.id;
+  const deckId = (ext: string) => (decks ?? []).find((d) => d.external_id === ext)?.id;
   const unitList = (units ?? []) as Unit[];
 
   return (
