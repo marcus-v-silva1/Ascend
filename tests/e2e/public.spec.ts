@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("visitante é levado ao login", async ({ page }) => {
   await page.goto("/dashboard");
   await expect(page).toHaveURL(/\/login\?next=%2Fdashboard/);
-  await expect(page.getByRole("heading", { name: "Glow-Up" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Entrar no Ascend" })).toBeVisible();
 });
 
 test("e-mail que não é do dono não entra", async ({ page }) => {

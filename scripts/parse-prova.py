@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Converte o texto de uma prova (pdftotext -enc UTF-8) + gabarito oficial em JSON de importação do Glow-Up.
+"""Converte o texto de uma prova (pdftotext -enc UTF-8) + gabarito oficial em JSON de importação do Ascend.
 
 Uso:
   python -X utf8 scripts/parse-prova.py --config provas/config.json

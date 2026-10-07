@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Suspense } from "react";
 import { useTheme } from "next-themes";
 import { LogOut, Menu, Moon, Sun } from "lucide-react";
+import { AscendLogo, ContourLines } from "@/components/brand";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/app/login/actions";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -33,7 +34,7 @@ function NavLinks({ onNavigate, pathname }: { onNavigate?: () => void; pathname:
                     className={cn(
                       "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
                       active
-                        ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                        ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground shadow-[inset_2px_0_0_var(--summit)]"
                         : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
                     )}
                   >
@@ -73,16 +74,22 @@ function ThemeToggle() {
 
 function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
   return (
-    <div className="flex h-full flex-col bg-sidebar px-3 py-5 text-sidebar-foreground">
-      <Link href="/dashboard" className="mb-8 px-3 font-[family-name:var(--font-display)] text-lg font-semibold text-white">
-        Glow-Up
+    <div className="relative flex h-full flex-col overflow-hidden bg-sidebar px-3 py-5 text-sidebar-foreground">
+      <ContourLines className="absolute -bottom-40 -left-44 size-[26rem] text-sidebar-primary/[0.07]" />
+      <Link
+        href="/dashboard"
+        onClick={onNavigate}
+        aria-label="Ascend: ir para Hoje"
+        className="relative mb-8 rounded-md px-3 py-1 text-white outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+      >
+        <AscendLogo />
       </Link>
-      <div className="flex-1 overflow-y-auto">
+      <div className="relative flex-1 overflow-y-auto">
         <Suspense fallback={<NavLinks pathname="" />}>
           <ActiveNavLinks onNavigate={onNavigate} />
         </Suspense>
       </div>
-      <div className="mt-4 space-y-0.5 border-t border-sidebar-border pt-4">
+      <div className="relative mt-4 space-y-0.5 border-t border-sidebar-border pt-4">
         <ThemeToggle />
         <form action={signOut}>
           <button

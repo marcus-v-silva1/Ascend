@@ -1,4 +1,4 @@
-# Glow-Up
+# Ascend
 
 App pessoal para estudos, carreira, hábitos e finanças: questões e simulados com revisão espaçada, flashcards (FSRS), plano de carreira com OKRs, ranking de concursos e rotas para a Europa, Kanban, hábitos, Pomodoro, revisão semanal, reserva de mudança e acompanhamento do inglês.
 

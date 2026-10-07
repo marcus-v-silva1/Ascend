@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ContourLines } from "@/components/brand";
 import { LinkButton } from "@/components/link-button";
 import { requireUser } from "@/lib/auth";
 import { countDueToday } from "@/lib/data/flashcards";
@@ -153,20 +154,21 @@ export default async function DashboardPage() {
       </header>
 
       {/* A faixa do dia: o que fazer hoje, em ordem */}
-      <section aria-label="Hoje" className="overflow-hidden rounded-xl bg-sidebar text-sidebar-foreground">
-        <ol className="grid divide-sidebar-border sm:grid-cols-4 sm:divide-x">
+      <section aria-label="Hoje" className="relative overflow-hidden rounded-xl bg-ink text-sidebar-foreground">
+        <ContourLines className="absolute -top-56 -right-24 size-[34rem] text-glacier/10" />
+        <ol className="relative grid divide-sidebar-border sm:grid-cols-4 sm:divide-x">
           {agenda.map((a, i) => (
             <li key={a.label} className="flex flex-col gap-1 border-sidebar-border p-5 max-sm:border-b max-sm:last:border-b-0">
               <p className="flex items-center gap-2 text-xs text-sidebar-foreground/70">
-                <span className="num">{i + 1}</span> {a.label}
+                <span className="num text-summit">{i + 1}</span> {a.label}
               </p>
               <p className={cn("num text-3xl font-semibold text-white", a.done && "text-[#4cc28c]")} style={{ fontFamily: "var(--font-sora)" }}>
                 {a.value}
                 {a.unit && <span className="ml-1 text-base font-normal text-sidebar-foreground/70">{a.unit}</span>}
               </p>
-              <p className={cn("text-xs", !a.done && i === 0 && cardsLeft ? "text-warn" : "text-sidebar-foreground/70")}>{a.hint}</p>
+              <p className={cn("text-xs", !a.done && i === 0 && cardsLeft ? "text-summit" : "text-sidebar-foreground/70")}>{a.hint}</p>
               {!a.done && (
-                <Link href={a.href} className="mt-2 w-fit rounded-md bg-sidebar-accent px-3 py-1.5 text-sm text-white hover:bg-sidebar-primary/40 focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none">
+                <Link href={a.href} className="mt-2 w-fit rounded-md bg-white/10 px-3 py-1.5 text-sm text-white ring-1 ring-white/10 transition-colors hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none">
                   {a.cta}
                 </Link>
               )}

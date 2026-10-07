@@ -73,7 +73,7 @@ export function Pomodoro({ subjects }: { subjects: { id: string; label: string }
   const ss = String(Math.floor((remaining % 60_000) / 1000)).padStart(2, "0");
 
   useEffect(() => {
-    document.title = running ? `${mm}:${ss} · ${phase === "focus" ? "Foco" : "Pausa"}` : "Foco · Glow-Up";
+    document.title = running ? `${mm}:${ss} · ${phase === "focus" ? "Foco" : "Pausa"}` : "Foco · Ascend";
   }, [running, mm, ss, phase]);
 
   function start() {

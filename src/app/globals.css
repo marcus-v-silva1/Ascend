@@ -52,11 +52,17 @@
   --color-warn: var(--warn);
   --color-warn-foreground: var(--warn-foreground);
   --color-success: var(--success);
+  --color-summit: var(--summit);
+  --color-ink: var(--ink);
+  --color-glacier: var(--glacier);
   --font-display: var(--font-sora);
 }
 
 :root {
-  /* Papel frio + tinta azul-marinho; cobalto = progresso, âmbar = vence hoje */
+  /* Ascend: tinta noturna + papel frio; azul = subida, âmbar = cume (o que importa hoje) */
+  --ink: #0e1525;
+  --summit: #f2a33a;
+  --glacier: #9db4ff;
   --background: #f7f8fa;
   --foreground: #1b2333;
   --card: #ffffff;
@@ -84,22 +90,25 @@
   --chart-4: #8b5cf6;
   --chart-5: #c2410c;
   --radius: 0.5rem;
-  --sidebar: #1b2333;
-  --sidebar-foreground: #c9d0de;
-  --sidebar-primary: #7c96f0;
+  --sidebar: #0e1525;
+  --sidebar-foreground: #c3cbdb;
+  --sidebar-primary: #9db4ff;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #273149;
+  --sidebar-accent: #1c2740;
   --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #2b3550;
+  --sidebar-border: #222d47;
   --sidebar-ring: #7c96f0;
 }
 
 .dark {
-  --background: #121826;
+  --ink: #090e1a;
+  --summit: #f5b452;
+  --glacier: #9db4ff;
+  --background: #0f1524;
   --foreground: #e6e9f0;
-  --card: #1a2233;
+  --card: #161e31;
   --card-foreground: #e6e9f0;
-  --popover: #1a2233;
+  --popover: #161e31;
   --popover-foreground: #e6e9f0;
   --primary: #7c96f0;
   --primary-foreground: #0f1630;
@@ -121,7 +130,7 @@
   --chart-3: #f0b85e;
   --chart-4: #a78bfa;
   --chart-5: #f07a4a;
-  --sidebar: #0e1420;
+  --sidebar: #090e1a;
   --sidebar-foreground: #b4bdd0;
   --sidebar-primary: #7c96f0;
   --sidebar-primary-foreground: #ffffff;

@@ -17,15 +17,16 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  title: { default: "Glow-Up", template: "%s · Glow-Up" },
-  description: "Estudos, carreira, hábitos e finanças num só lugar.",
-  applicationName: "Glow-Up",
+  title: { default: "Ascend", template: "%s · Ascend" },
+  description: "Estudos, carreira, hábitos e finanças: um passo de cada vez.",
+  applicationName: "Ascend",
+  appleWebApp: { title: "Ascend", statusBarStyle: "black-translucent" },
 };
 
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f7f8fa" },
-    { media: "(prefers-color-scheme: dark)", color: "#121826" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f1524" },
   ],
 };
 

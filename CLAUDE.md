@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# Glow-Up — notas do projeto
+# Ascend — notas do projeto
 
 - App de dono único: toda página autenticada chama `requireUser()` (`src/lib/auth.ts`); toda tabela tem `user_id` + RLS.
 - Regras de negócio puras ficam em `src/lib/*.ts` com testes em `tests/unit`. Mantenha-as sem dependência de Supabase.

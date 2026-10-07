@@ -24,10 +24,10 @@ export function QuestionsChart({ data }: { data: DayPoint[] }) {
     <figure>
       <div className="h-44" role="img" aria-label={`Questões respondidas nos últimos ${data.length} dias: ${total} no total.`}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 4, right: 0, bottom: 0, left: -24 }} barCategoryGap={2}>
+          <BarChart data={data} margin={{ top: 4, right: 0, bottom: 0, left: 0 }} barCategoryGap={2}>
             <CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="0" />
             <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} interval="preserveStartEnd" minTickGap={16} />
-            <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} width={40} />
+            <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} width={28} />
             <Tooltip content={<ChartTooltip />} cursor={{ fill: "var(--muted)", opacity: 0.6 }} />
             <Bar dataKey="answered" fill="var(--chart-1)" radius={[4, 4, 0, 0]} maxBarSize={28} />
           </BarChart>

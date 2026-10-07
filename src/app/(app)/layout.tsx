@@ -1,5 +1,7 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { MobileNav, Sidebar } from "@/components/app-nav";
+import { AscendLogo } from "@/components/brand";
 import { requireUser } from "@/lib/auth";
 import { ensureContent } from "@/lib/content/bootstrap";
 
@@ -30,6 +32,11 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
     <div className="flex min-h-dvh">
       <Sidebar />
       <main className="min-w-0 flex-1 px-4 pt-6 pb-24 sm:px-6 lg:px-10 lg:pb-10">
+        <header className="-mx-4 -mt-6 mb-6 flex items-center border-b bg-card/80 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
+          <Link href="/dashboard" aria-label="Ascend: ir para Hoje" className="text-foreground">
+            <AscendLogo markClassName="size-6" />
+          </Link>
+        </header>
         <div className="mx-auto max-w-6xl">
           <Suspense fallback={<PageSkeleton />}>
             <Gate>{children}</Gate>

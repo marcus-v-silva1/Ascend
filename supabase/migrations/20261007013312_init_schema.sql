@@ -1,4 +1,4 @@
--- Glow-Up: schema inicial.
+-- Ascend: schema inicial.
 -- Toda tabela de dados pertence a um usuário (user_id) e é protegida por RLS.
 -- O app é de dono único; a restrição de e-mail fica no proxy/servidor, o RLS
 -- garante o isolamento mesmo que outra conta seja criada por engano.
