@@ -145,7 +145,8 @@ export const MILESTONES = [
   { external_id: "m-tjsc-edital", track: "concursos", title: "Acompanhar edital TJSC Analista de Sistemas", due_date: "2027-03-31" },
   { external_id: "m-eu-first-apps", track: "europa", goal: "g-eu-apply", title: "Primeiras 10 candidaturas (Irlanda + Alemanha)", due_date: "2027-01-31" },
   { external_id: "m-eu-reserve", track: "europa", title: "Reserva de mudança completa", due_date: "2027-09-30" },
-  { external_id: "m-en-inter", track: "ingles", goal: "g-en-b2", title: "Concluir nível intermediário nas plataformas Times", due_date: "2027-03-31" },
+  { external_id: "m-en-book2", track: "ingles", goal: "g-en-b2", title: "Concluir o Book 2 (Activate) da Times: estava em 75% em 07/10", due_date: "2026-12-15" },
+  { external_id: "m-en-book3", track: "ingles", goal: "g-en-b2", title: "Concluir o Book 3 (Development) da Times", due_date: "2027-05-31" },
 ];
 
 export const TARGETS = [

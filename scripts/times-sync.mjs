@@ -20,6 +20,9 @@ const SITES = [
   { platform: "times_digital_books", url: "https://new.timesdigitalbooks.com/#/home", host: "timesdigitalbooks.com" },
   { platform: "times_connected", url: "https://timesconnected.com.br/#/home", host: "timesconnected.com.br" },
 ];
+// O Times Connected é um app Flutter: os dados vêm da API em controllercore.timescontroller.com.br
+// (rotas observadas: /api/statistics/home, /api/next-classes, /api/scores/<aluno>/<livro>, /api/points/me)
+const API_HOSTS = [{ platform: "times_connected", host: "timescontroller.com.br" }];
 const SESSION_DIR = ".times-session";
 const RAW_DIR = join(".times-data", "raw");
 const OUTPUT = "times-export.json";
@@ -36,7 +39,7 @@ async function capture() {
   context.on("response", async (response) => {
     try {
       const url = new URL(response.url());
-      const site = SITES.find((s) => url.hostname.endsWith(s.host));
+      const site = [...SITES, ...API_HOSTS].find((s) => url.hostname.endsWith(s.host));
       if (!site) return;
       const type = response.headers()["content-type"] ?? "";
       if (!type.includes("json") || response.status() >= 400) return;
@@ -57,7 +60,7 @@ async function capture() {
 
   console.log("\nNavegador aberto.");
   console.log("1. Faça login nas duas abas, se pedir.");
-  console.log("2. Abra seus cursos, livros e a tela de progresso/notas de cada plataforma.");
+  console.log("2. Na Times Connected abra Minha Evolução e Play and Practice; na Digital Books abra seus livros.");
   console.log("3. Feche o navegador quando terminar.\n");
 
   await new Promise((resolve) => context.on("close", resolve));
